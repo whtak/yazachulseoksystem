@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출석 체크</title>
+</head>
+<body>
+    <h2>출석 체크</h2>
+    <input type="text" id="studentId" placeholder="학번 입력 (4자리)" onkeypress="handleKeyPress(event)">
+    <button onclick="addEntry()">추가</button>
+    <p id="message"></p>
+
+    <script>
+        const scriptURL = "https://script.google.com/macros/s/AKfycbzgGb-FvNz7pTMtwDE3h-gbvmt6WR0WZeB45xBreOz-JyLR-scQyqCxBOXM2SPIaxeY/exec";
+
+        function addEntry() {
+            const studentId = document.getElementById("studentId").value.trim();
+            if (!/^\d{4}$/.test(studentId)) {
+                document.getElementById("message").innerText = "❌ 학번은 4자리 숫자로 입력해야 합니다!";
+                return;
+            }
+
+            const formattedTime = new Date().toLocaleString();
+
+            fetch(scriptURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                mode: "no-cors",
+                body: JSON.stringify({ studentId, time: formattedTime })
+            })
+            .then(() => {
+                document.getElementById("message").innerText = "✅ 출석 요청 완료!";
+                document.getElementById("studentId").value = "";
+            })
+            .catch(err => {
+                console.error("Fetch Error:", err);
+                document.getElementById("message").innerText = "⚠️ 출석 처리 실패!";
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                addEntry();
+            }
+        }
+    </script>
+</body>
+</html>
